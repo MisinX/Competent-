@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Competent+ - Competency Assessment Tool</title>
+    <style>
+        :root {
+            --color-bg-primary: #f8fafc;
+            --color-bg-secondary: #ffffff;
+            --color-text-primary: #0f172a;
+            --color-text-secondary: #64748b;
+            --color-primary: #0ea5e9;
+            --color-success: #16a34a;
+            --color-warning: #f59e0b;
+            --color-error: #ef4444;
+            --color-border: #e2e8f0;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --color-bg-primary: #0f172a;
+                --color-bg-secondary: #1e293b;
+                --color-text-primary: #f1f5f9;
+                --color-text-secondary: #94a3b8;
+                --color-border: #334155;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--color-bg-primary);
+            color: var(--color-text-primary);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            flex: 1;
+        }
+
+        header {
+            background: var(--color-bg-secondary);
+            padding: 26px;
+            border-radius: 12px;
+            margin-bottom: 22px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        h1 {
+            font-size: 28px;
+            color: var(--color-primary);
+        }
+
+        .subhead {
+            color: var(--color-text-secondary);
+            margin-top: 6px;
+            font-size: 14px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 12px 22px;
+            background: var(--color-bg-secondary);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--color-text-secondary);
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .tab:hover,
+        .tab.active {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            background: var(--color-bg-secondary);
+            padding: 28px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section-title {
+            font-size: 20px;
+            margin-bottom: 14px;
+            color: var(--color-primary);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 14px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        label {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+        }
+
+        input, select, textarea {
+            padding: 10px 12px;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            background: var(--color-bg-primary);
+            color: var(--color-text-primary);
+            font-size: 14px;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .card {
+            background: var(--color-bg-primary);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid var(--color-border);
+        }
+
+        .muted {
+            color: var(--color-text-secondary);
+            font-size: 13px;
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .badge.ok { background: #dcfce7; color: #166534; }
+        .badge.warn { background: #fef3c7; color: #92400e; }
+
+        .report-result {
+            font-size: 42px;
+            font-weight: 800;
+            margin-top: 6px;
+        }
+
+        .report-result.good { color: #15803d; }
+        .report-result.bad { color: #b91c1c; }
+        .report-result.neutral { color: var(--color-text-secondary); }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+
+        th, td {
+            border-bottom: 1px solid var(--color-border);
+            padding: 10px;
+            text-align: left;
+            vertical-align: top;
+            font-size: 13px;
+        }
+
+        th {
+            background: var(--color-bg-primary);
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+        }
+
+        .score-select {
+            width: 90px;
+        }
+
+        .na-row td {
+            background: #e5e7eb;
+            color: #64748b;
+        }
+
+        .na-label {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 8px;
+            background: #cbd5f5;
+            color: #1e293b;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 16px 0 0;
+        }
+
+        .action-buttons button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            background: var(--color-primary);
+            color: #fff;
+        }
+
+        .action-buttons button.secondary {
+            background: #64748b;
+        }
+
+        .action-buttons .push-right {
+            margin-left: auto;
+        }
+
+        .steps {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .step-btn {
+            padding: 8px 14px;
+            border-radius: 999px;
+            border: 1px solid var(--color-border);
+            background: var(--color-bg-secondary);
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .step-btn.active {
+            background: var(--color-primary);
+            color: #fff;
+            border-color: var(--color-primary);
+        }
+
+        .step-content { display: none; }
+        .step-content.active { display: block; }
+
+        .step-nav {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .workflow-card {
+            display: flex;
+            justify-content: center;
+        }
+
+        .workflow-card .mermaid {
+            max-width: 980px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .app-footer {
+            margin: 20px auto 10px;
+            padding: 14px 22px;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            color: var(--color-text-secondary);
+            font-size: 12px;
+            text-align: center;
+            border-radius: 999px;
+            max-width: 900px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+            align-self: center;
+        }
+
+        .app-footer strong { color: var(--color-text-primary); }
+
+        .signature-line {
+            display: inline-block;
+            min-width: 220px;
+            border-bottom: 1px solid var(--color-border);
+            margin-left: 8px;
+            height: 14px;
+        }
+
+        .required-note {
+            color: var(--color-error);
+            font-size: 12px;
+            margin-top: 6px;
+        }
+
+        .report-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .report-header h2 {
+            margin: 0;
+        }
+
+        .report-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 12px;
+        }
+
+        .report-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 14px 16px;
+        }
+
+        @media print {
+            header, .tabs, .action-buttons, .steps, .step-nav, .print-hide { display: none !important; }
+            .tab-content { display: none !important; box-shadow: none; padding: 0; }
+            #report { display: block !important; }
+            body { background: #fff; color: #000; padding: 0; }
+            .report-card { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div style="display:flex; align-items:center; gap:18px;">
+                <img src="kuwait-airways-logo.png" alt="Kuwait Airways" style="height:64px;">
+                <div style="flex:1;">
+                    <h1>Competent+</h1>
+                    <div class="subhead">Competency Assessment Tool | KUK-QA-CA-314</div>
+                </div>
+                <img src="competent-logo.png" alt="Competent+" style="height:128px;">
+            </div>
+        </header>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('home')">🏠 Home</button>
+            <button class="tab" onclick="switchTab('assessment')">🧭 Assessment</button>
+            <button class="tab" onclick="switchTab('report')">📄 Report</button>
+            <button class="tab" onclick="switchTab('guide')">📖 User Guide</button>
+            <button class="tab" onclick="switchTab('support')">📞 Support</button>
+            <button class="tab" onclick="switchTab('about')">ℹ️ About</button>
+        </div>
+
+        <div id="home" class="tab-content active">
+            <div style="display:flex; justify-content:center; margin:10px 0 25px 0;">
+                <img src="competent-logo.png" alt="Competent+" style="height:660px;">
+            </div>
+            <div class="card" style="margin-bottom:18px;">
+                <h3 class="section-title">Overview</h3>
+                <p>Competent+ digitizes the KUK-QA-CA-314 Competency Assessment Form. It helps assessors capture qualification requirements, evaluate competence, and generate a printable report.</p>
+            </div>
+            <div class="card" style="margin-bottom:18px;">
+                <h3 class="section-title">Quick Start</h3>
+                <p>1. Complete the Assessment steps in order.</p>
+                <p>2. Required fields must be filled to move forward.</p>
+                <p>3. Print the report and sign on the signature lines.</p>
+                <p class="muted" style="margin-top:8px;">Note: Data is not saved automatically. Use “Save Data” to keep a local copy.</p>
+            </div>
+            <div class="card">
+                <h3 class="section-title">Workflow</h3>
+                <div class="workflow-card">
+                    <div class="mermaid">
+                        flowchart TD
+                            A["Assessment date & assessee details"] --> B["Purpose & category selection"]
+                            B --> C["Training evidence & justifications"]
+                            C --> D["Skills scoring + N/A justification"]
+                            D --> E["Evaluation decision"]
+                            E --> F["Final review & remarks"]
+                            F --> G["Generate report, print & sign"]
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="assessment" class="tab-content">
+            <div class="card" style="margin-bottom:16px;">
+                <h3 class="section-title">Assessment Date</h3>
+                <div class="field" style="max-width:320px;">
+                    <label>Assessment Date *</label>
+                    <input id="assessment_date" type="date" required>
+                </div>
+            </div>
+
+            <div class="steps">
+                <button class="step-btn active" onclick="requestStep(0)">Step 1: Assessee</button>
+                <button class="step-btn" onclick="requestStep(1)">Step 2: Purpose</button>
+                <button class="step-btn" onclick="requestStep(2)">Step 3: Training</button>
+                <button class="step-btn" onclick="requestStep(3)">Step 4: Skills</button>
+                <button class="step-btn" onclick="requestStep(4)">Step 5: Evaluation</button>
+                <button class="step-btn" onclick="requestStep(5)">Step 6: Final Review</button>
+            </div>
+
+            <div id="step-0" class="step-content active">
+                <h2 class="section-title">Section 1: Details of the Assessee</h2>
+                <div class="card">
+                    <div class="grid-2">
+                        <div class="field"><label>Name *</label><input id="ass_name" type="text" required></div>
+                        <div class="field"><label>Staff No *</label><input id="ass_staff" type="text" required></div>
+                        <div class="field"><label>Designation *</label><input id="ass_designation" type="text" required></div>
+                        <div class="field"><label>Quality Auth. No (KUK) if applicable</label><input id="ass_qa" type="text"></div>
+                        <div class="field"><label>KAC Date of Joining *</label><input id="ass_join" type="date" required></div>
+                        <div class="field"><label>Period in Present Position *</label><input id="ass_period" type="text" required></div>
+                        <div class="field"><label>Section / Outstation *</label><input id="ass_section" type="text" required></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="step-1" class="step-content">
+                <h2 class="section-title">Section 2: Assessment Purpose & Category</h2>
+                <div class="card" style="margin-bottom:18px;">
+                    <div class="field" style="margin-bottom:12px;">
+                        <label>Assessment Purpose *</label>
+                        <select id="purpose_select" required>
+                            <option value="">Select purpose</option>
+                            <option value="Initial">Initial</option>
+                            <option value="Recurrent/Renewal">Recurrent/Renewal</option>
+                            <option value="Change of Qualification/Extension">Change of Qualification/Extension</option>
+                        </select>
+                    </div>
+                    <p class="muted">Select up to two assessment categories (mandatory).</p>
+                    <div class="grid-2" style="margin-top:10px;">
+                        <label><input type="checkbox" class="cat" value="1"> 1. Management Personnel/Managers</label>
+                        <label><input type="checkbox" class="cat" value="2"> 2. CAMO Personnel/Planners</label>
+                        <label><input type="checkbox" class="cat" value="3"> 3. Supervision Personnel</label>
+                        <label><input type="checkbox" class="cat" value="4"> 4. Certifying/Support Staff</label>
+                        <label><input type="checkbox" class="cat" value="5"> 5. Mechanic</label>
+                        <label><input type="checkbox" class="cat" value="6"> 6. Logistics/Material/Store Inspector Personnel</label>
+                        <label><input type="checkbox" class="cat" value="7"> 7. Compliance Monitoring Staff</label>
+                        <label><input type="checkbox" class="cat" value="8"> 8. Specialized Services</label>
+                        <label><input type="checkbox" class="cat" value="9"> 9. Airworthiness Review Staff</label>
+                        <label><input type="checkbox" class="cat" value="10"> 10. Others</label>
+                    </div>
+                </div>
+                <div class="card">
+                    <p class="muted">If the evaluated person does not fulfill any section requirements for selected categories, indicate improvement actions in Section 6.</p>
+                </div>
+            </div>
+
+            <div id="step-2" class="step-content">
+                <h2 class="section-title">Section 3: Qualification Requirements (Training)</h2>
+                <div class="card">
+                    <table>
+                        <thead>
+                            <tr><th>Training</th><th>Initial Date *</th><th>Recurrent Date *</th><th>Justification (if missing/expired) *</th></tr>
+                        </thead>
+                        <tbody id="training-rows"></tbody>
+                    </table>
+                    <div class="action-buttons" style="margin-top:12px;">
+                        <button type="button" onclick="addTrainingRow()">➕ Add Training</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="step-3" class="step-content">
+                <h2 class="section-title">Section 4: Understanding, Abilities & Skills</h2>
+                <div class="card">
+                    <p class="muted">Scoring: 1 = demonstrates, 0.5 = partial, 0 = does not demonstrate. Mark N/A when not applicable. If N/A is selected, justification is mandatory.</p>
+                    <div id="skills-container"></div>
+                </div>
+            </div>
+
+            <div id="step-4" class="step-content">
+                <h2 class="section-title">Section 5: Competency Assessment Evaluation</h2>
+                <div class="card">
+                    <div class="grid-2">
+                        <div class="field"><label>Assessor Name *</label><input id="eval_assessor" required></div>
+                        <div class="field"><label>Assessor Designation *</label><input id="eval_designation" required></div>
+                        <div class="field"><label>Date *</label><input id="eval_date" type="date" required></div>
+                    </div>
+                    <div style="margin-top:14px;">
+                        <label>Evaluation Decision *</label>
+                        <select id="eval_decision" required>
+                            <option value="">Select decision</option>
+                            <option value="competent">Is competent</option>
+                            <option value="needs_improve">Needs to improve performance</option>
+                        </select>
+                    </div>
+                    <p class="muted" style="margin-top:10px;">Disclaimer: This evaluation is conducted I.A.W MOE chapter 3.14 and GM 2 145.A.30(e). Assessor is responsible for accuracy and evidence of records.</p>
+                    <div class="field" style="margin-top:10px;">
+                        <label><input type="checkbox" id="eval_signature_confirm"> Assessor signature will be completed on printed report *</label>
+                    </div>
+                </div>
+            </div>
+
+            <div id="step-5" class="step-content">
+                <h2 class="section-title">Section 6: Final Review & Remarks</h2>
+                <div class="card">
+                    <div class="field">
+                        <label>Remarks and Improvement Actions *</label>
+                        <textarea id="remarks_text" required placeholder="Record required improvements and remarks..."></textarea>
+                    </div>
+                    <div class="grid-2" style="margin-top:12px;">
+                        <div class="field"><label>Assessor Name *</label><input id="rem_assessor" required></div>
+                        <div class="field"><label>Date *</label><input id="rem_date" type="date" required></div>
+                        <div class="field"><label>Manager Name *</label><input id="sig_section_manager" required></div>
+                    </div>
+                    <div class="field" style="margin-top:10px;">
+                        <label><input type="checkbox" id="rem_signature_confirm"> Assessor signature will be completed on printed report *</label>
+                    </div>
+                    <div class="card" style="margin-top:12px;">
+                        <p class="muted">Note: Engineering & Maintenance Director name/signature required only for managers and deputies competency assessment. Quality/Compliance Monitoring Manager name/signature required only for certifying staff and newly appointed managers. Signatures are completed manually on the printed report.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-nav">
+                <button class="tab" onclick="prevStep()">⬅ Back</button>
+                <button class="tab" onclick="nextStep()">Next ➜</button>
+            </div>
+        </div>
+
+        <div id="report" class="tab-content">
+            <div class="report-header">
+                <img src="competent-logo.png" alt="Competent+" style="height:48px;">
+                <div>
+                    <h2 class="section-title">Competency Assessment Report</h2>
+                    <div class="muted">KUK-QA-CA-314 | Generated by Competent+</div>
+                </div>
+            </div>
+
+            <div class="report-grid">
+                <div class="report-card">
+                    <h3>Assessee Summary</h3>
+                    <p><strong>Name:</strong> <span id="rep_name"></span></p>
+                    <p><strong>Staff No:</strong> <span id="rep_staff"></span></p>
+                    <p><strong>Designation:</strong> <span id="rep_desig"></span></p>
+                    <p><strong>Quality Auth. No (KUK):</strong> <span id="rep_qa"></span></p>
+                    <p><strong>KAC Date of Joining:</strong> <span id="rep_join"></span></p>
+                    <p><strong>Period in Present Position:</strong> <span id="rep_period"></span></p>
+                    <p><strong>Section/Outstation:</strong> <span id="rep_section"></span></p>
+                </div>
+                <div class="report-card">
+                    <h3>Assessment Details</h3>
+                    <p><strong>Assessment Date:</strong> <span id="rep_assess_date"></span></p>
+                    <p><strong>Assessment Purpose:</strong> <span id="rep_purpose"></span></p>
+                    <p><strong>Categories:</strong> <span id="rep_categories"></span></p>
+                </div>
+            </div>
+
+            <div class="report-card" style="margin-top:14px;">
+                <h3>Scoring Summary</h3>
+                <div id="rep_scores"></div>
+            </div>
+            <div class="report-card" style="margin-top:14px;">
+                <h3>Training Evidence</h3>
+                <div id="rep_training"></div>
+            </div>
+            <div class="report-card" style="margin-top:14px;">
+                <h3>Skills Details</h3>
+                <div id="rep_skills"></div>
+            </div>
+            <div class="report-card" style="margin-top:14px;">
+                <h3>Evaluation Details</h3>
+                <div id="rep_eval_detail"></div>
+            </div>
+            <div class="report-card" style="margin-top:14px;">
+                <h3>Evaluation Decision</h3>
+                <p id="rep_eval" class="report-result neutral"></p>
+            </div>
+            <div class="report-card" style="margin-top:14px;">
+                <h3>Remarks & Improvement Actions</h3>
+                <p id="rep_remarks"></p>
+            </div>
+            <div class="report-card" style="margin-top:14px;">
+                <h3>Signatures (Manual filling when printed, electronic filling if saved as PDF.)</h3>
+                <p><strong>Assessor Name:</strong> <span class="signature-line"></span></p>
+                <p><strong>Signature:</strong> <span class="signature-line"></span></p>
+                <p><strong>Date:</strong> <span class="signature-line"></span></p>
+                <br>
+                <p><strong>Manager Name:</strong> <span class="signature-line"></span></p>
+                <p><strong>Signature:</strong> <span class="signature-line"></span></p>
+                <p><strong>Date:</strong> <span class="signature-line"></span></p>
+                <br>
+                <p><strong>Engineering & Maintenance Director Name:</strong> <span class="signature-line"></span></p>
+                <p><strong>Signature:</strong> <span class="signature-line"></span></p>
+                <p><strong>Date:</strong> <span class="signature-line"></span></p>
+                <div style="margin: 8px 0 18px; padding: 8px 12px; background: var(--color-bg-primary); border-radius: 8px; border: 1px solid var(--color-border); font-size: 12px; color: var(--color-text-secondary);">
+                    *Note: Director Signature Applicable Only for Management Personnel/Manager Assessments
+                </div>
+                <p><strong>Quality/Compliance Monitoring Manager Name:</strong> <span class="signature-line"></span></p>
+                <p><strong>Signature:</strong> <span class="signature-line"></span></p>
+                <p><strong>Date:</strong> <span class="signature-line"></span></p>
+                <div style="margin-top: 8px; padding: 8px 12px; background: var(--color-bg-primary); border-radius: 8px; border: 1px solid var(--color-border); font-size: 12px; color: var(--color-text-secondary);">
+                    *Note: Quality Manager Signature Applicable Only for Certifying/Support Staff, Specialized Services and Part-145 Supervision Personnel Assessments
+                </div>
+            </div>
+        </div>
+
+        <div id="guide" class="tab-content">
+            <h2 class="section-title">📖 User Guide - Competent+</h2>
+            <div class="card" style="margin-bottom:16px;">
+                <h3 style="color: var(--color-primary); margin-bottom: 10px;">Quick Start</h3>
+                <p>1. Start in Assessment and complete steps in order.</p>
+                <p>2. Required fields must be completed to move forward.</p>
+                <p>3. Use Report tab to review results and print.</p>
+            </div>
+            <div class="card" style="margin-bottom:16px;">
+                <h3 style="color: var(--color-primary); margin-bottom: 10px;">Data & Storage</h3>
+                <p>• Data is not saved automatically.</p>
+                <p>• Use “Save Data” to download a JSON file for records.</p>
+                <p>• Use “Load Data” to continue a saved assessment.</p>
+            </div>
+            <div class="card">
+                <h3 style="color: var(--color-primary); margin-bottom: 10px;">Printing</h3>
+                <p>• Print generates a clean report with summary, scores, and signature lines.</p>
+                <p>• Signatures are completed manually on the printed report.</p>
+            </div>
+            <div class="card" style="margin-top:16px;">
+                <h3 style="color: var(--color-primary); margin-bottom: 10px;">Results Guidance</h3>
+                <p>• <strong>COMPETENT</strong> indicates the assessee meets the required standard for the selected categories.</p>
+                <p>• <strong>NEEDS IMPROVEMENT</strong> indicates gaps were identified and improvement actions are required.</p>
+                <p>• Review the scoring summary and remarks for details and follow-up actions.</p>
+            </div>
+        </div>
+
+        <div id="support" class="tab-content">
+            <h2 class="section-title">📞 Support & Contact</h2>
+            <div class="card" style="margin-bottom:16px;">
+                <h3 style="color: var(--color-primary); margin-bottom: 10px;">🏢 Kuwait Airways - Quality/Compliance Monitoring - Engineering</h3>
+            </div>
+            <div class="card">
+                <h3 style="color: var(--color-primary); margin-bottom: 10px;">💡 Technical Support</h3>
+                <p>For technical issues with this tool, please contact:</p>
+                <p style="margin-top: 10px;"><strong>Tool Developer:</strong> Engr. Abdulmuhsen Haji Mohammad</p>
+                <p><strong>Email:</strong> abdulmuhsen.mohammad@kuwaitairways.com</p>
+                <p><strong>Available:</strong> Sunday-Thursday, 8:00 AM - 2:00 PM Kuwait Time</p>
+            </div>
+            <div class="card" style="margin-top:16px;">
+                <h3 style="color: var(--color-primary); margin-bottom: 10px;">📋 Assessment Support</h3>
+                <p><strong>Quality/Compliance Monitoring Section - Quality Engineers</strong></p>
+                <p class="muted" style="margin-top:6px;">For guidance on assessment methodology, scoring, and compliance requirements.</p>
+            </div>
+        </div>
+
+        <div id="about" class="tab-content">
+            <h2 class="section-title">ℹ️ About Competent+</h2>
+            <div class="card" style="margin-bottom:16px; display:flex; align-items:center; gap:16px;">
+                <img src="competent-logo.png" alt="Competent+" style="height:72px;">
+                <div>
+                    <p><strong>Application:</strong> Competent+</p>
+                    <p><strong>Tool Version:</strong> 1.0.0</p>
+                    <p><strong>Last Updated:</strong> February 2026</p>
+                    <p><strong>Department:</strong> Kuwait Airways - Quality/Compliance Monitoring - Engineering</p>
+                </div>
+            </div>
+            <div class="card" style="margin-bottom:16px;">
+                <h3 style="color: var(--color-primary); margin-bottom: 10px;">🔄 Version Control & Details</h3>
+                <p>• Managed under software version control with change history and author tracking</p>
+                <p>• Releases are tagged by version with documented changes</p>
+                <p>• Source updates follow internal review and approval workflow</p>
+            </div>
+            <div class="card">
+                <p><strong>Copyright:</strong> Kuwait Airways Quality/Compliance Monitoring - Engineering and AMXsoft. All rights reserved.</p>
+                <p class="muted" style="margin-top:8px;">Internal use only. Unauthorized copying, distribution, or modification is prohibited without written approval.</p>
+            </div>
+        </div>
+
+        <div id="action-buttons" class="action-buttons" style="display:none;">
+            <button class="secondary" onclick="resetForm()">↺ Reset</button>
+            <button class="secondary" onclick="saveData()">💾 Save Data</button>
+            <button class="secondary" onclick="loadData()">📂 Load Data</button>
+            <button class="secondary" onclick="window.print()">🖨️ Print Report</button>
+            <button class="push-right" onclick="fillDemoData()">✨ Demo Data</button>
+        </div>
+    </div>
+
+    <div class="app-footer">
+        <strong>Competent+</strong> — © 2026 Kuwait Airways Quality/Compliance Monitoring - Engineering
+        <br>AMXsoft. All rights reserved.
+        <br>Form KUK/QA/CA-314 Issue 02 Rev 0 Feb 2026
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        const categories = {
+            1: 'Management Personnel/Managers',
+            2: 'CAMO Personnel/Planners',
+            3: 'Supervision Personnel',
+            4: 'Certifying/Support Staff',
+            5: 'Mechanic',
+            6: 'Logistics/Material/Store Inspector Personnel',
+            7: 'Compliance Monitoring Staff',
+            8: 'Specialized Services',
+            9: 'Airworthiness Review Staff',
+            10: 'Others'
+        };
+
+        const questions = [
+            'Does the assessee demonstrate the knowledge of applicable officially recognized standards as applicable?',
+            'Does the assessee demonstrate the knowledge of auditing techniques: planning, conducting, and reporting?',
+            'Does the assessee demonstrate the knowledge of safety management, human factors, human performance, and limitations, and just culture?',
+            'Does the assessee demonstrate the knowledge of logistics processes?',
+            'Does the assessee able to use properly the computer applications required for the normal performance of his/her work?',
+            'Does the assessee demonstrate the knowledge of organization capabilities, privileges and limitations?',
+            'Does the assessee demonstrate the knowledge of EASA/KCASR, Part-M (CAMO), Part-145 and other relevant regulations?',
+            'Does the assessee demonstrate the knowledge of relevant parts of the MOE and procedures?',
+            'Does the assessee demonstrate the knowledge of occurrence reporting and importance of reporting?',
+            'Does the assessee demonstrate the knowledge of safety and security risks linked to the working environment?',
+            'Does the assessee demonstrate the knowledge of CDCCL when relevant?',
+            'Does the assessee demonstrate the knowledge of EWIS when relevant?',
+            'Does the assessee demonstrate the knowledge of EDTO/Special Operations?',
+            'Does the assessee demonstrate understanding of professional integrity, behavior, and attitude towards safety?',
+            'Does the assessee demonstrate understanding of conditions for ensuring continuing airworthiness of aircraft and components?',
+            'Does the assessee demonstrate understanding of his or her own human performance and limitations?',
+            'Does the assessee demonstrate understanding of personnel authorizations and limitations related to job functions?',
+            'Does the assessee demonstrate understanding of critical maintenance tasks and identical maintenance tasks?',
+            'Does the assessee demonstrate ability to compile and control completed work cards related to job functions?',
+            'Does the assessee demonstrate ability to consider human performance and limitations?',
+            'Does the assessee demonstrate ability to determine required qualifications for task performance related to job functions?',
+            'Does the assessee demonstrate ability to identify and rectify existing and potential unsafe conditions?',
+            'Does the assessee demonstrate ability to manage third parties involved in maintenance activity?',
+            'Does the assessee demonstrate ability to confirm proper accomplishment of maintenance tasks?',
+            'Does the assessee demonstrate ability to identify and properly plan performance of critical maintenance tasks?',
+            'Does the assessee demonstrate ability to prioritize tasks and report discrepancies?',
+            'Does the assessee demonstrate ability to process work requested by the operator related to job functions?',
+            'Does the assessee demonstrate ability to promote the safety policy?',
+            'Does the assessee demonstrate ability to properly process removed, uninstalled, and rejected parts?',
+            'Does the assessee demonstrate ability to properly record and sign for work accomplished related to job functions?',
+            'Does the assessee demonstrate ability to recognize acceptability of parts to be installed prior to fitment?',
+            'Does the assessee demonstrate ability to split complex maintenance tasks into clear stages?',
+            'Does the assessee demonstrate ability to understand work orders, work cards and use applicable maintenance data?',
+            'Does the assessee demonstrate ability to use, control and be familiar with required tooling/equipment?',
+            'Does the assessee demonstrate analytical and proven auditing skills?',
+            'Does the assessee demonstrate adequate knowledge of maintenance error investigation skills?',
+            'Does the assessee demonstrate ability to encourage a positive safety culture and apply a just culture (SMS)?',
+            'Does the assessee demonstrate knowledge of shift/task handover?',
+            'Is the assessee proactive in providing ideas for improvement?',
+            'Does the assessee make good use of resources and carry out activities correctly first time?',
+            'Does the assessee attend meetings and events pertinent to their job position on time?',
+            'Does the assessee communicate effectively?',
+            'Does the assessee show teamwork, decision making and leadership skills?'
+        ];
+
+        const applicabilityNA = {
+            1: [],
+            2: [1, 2, 3, 4, 5, 6, 8, 9, 10],
+            3: [],
+            4: [2, 5, 7, 8, 9, 10],
+            5: [],
+            6: [5, 10],
+            7: [],
+            8: [],
+            9: [],
+            10: [],
+            11: [],
+            12: [],
+            13: [],
+            14: [],
+            15: [5, 10],
+            16: [],
+            17: [],
+            18: [8, 10],
+            19: [1, 5, 6],
+            20: [],
+            21: [],
+            22: [],
+            23: [5, 6, 7, 8, 9, 10],
+            24: [1, 6, 10],
+            25: [5, 6, 8],
+            26: [],
+            27: [],
+            28: [],
+            29: [],
+            30: [1, 6, 10],
+            31: [1, 2, 7, 8, 9, 10],
+            32: [1, 5, 6, 7, 9, 10],
+            33: [6, 10],
+            34: [1, 2, 6, 7, 9, 10],
+            35: [1, 2, 3, 4, 5, 6, 8, 9, 10],
+            36: [1, 2, 3, 4, 5, 6, 8, 9, 10],
+            37: [],
+            38: [1, 2, 6, 7, 9, 10],
+            39: [],
+            40: [],
+            41: [],
+            42: [],
+            43: []
+        };
+
+        let scores = {};
+        let naJustifications = {};
+        let currentStep = 0;
+
+        function getSelectedCategories() {
+            return Array.from(document.querySelectorAll('.cat:checked')).map(c => c.value).slice(0, 2);
+        }
+
+        function enforceCategoryLimit() {
+            const checked = document.querySelectorAll('.cat:checked');
+            if (checked.length > 2) {
+                checked[checked.length - 1].checked = false;
+                alert('You can select up to two categories.');
+            }
+            renderSkillsTables();
+        }
+
+        function isApplicable(qnum, cat) {
+            return !(applicabilityNA[qnum] || []).includes(cat);
+        }
+
+        function isApplicableForSelected(qnum, selected) {
+            if (!selected.length) return false;
+            return selected.some(c => isApplicable(qnum, c));
+        }
+
+        function initTrainingRows(data = null) {
+            const tbody = document.getElementById('training-rows');
+            tbody.innerHTML = '';
+            const defaults = data || [
+                { title: 'Human Factors Training', init: '', rec: '', just: '' },
+                { title: 'Fuel Tank Safety (if applicable)', init: '', rec: '', just: '' },
+                { title: 'SMS', init: '', rec: '', just: '' },
+                { title: 'EWIS', init: '', rec: '', just: '' },
+                { title: 'MOE / CAME / EQCP', init: '', rec: '', just: '' },
+                { title: 'EASA/KCASR Part M / 145 / 66 / 147', init: '', rec: '', just: '' }
+            ];
+            defaults.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${row.title}</td>
+                    <td><input type="date" class="tr-init" value="${row.init || ''}"></td>
+                    <td><input type="date" class="tr-rec" value="${row.rec || ''}"></td>
+                    <td><input type="text" class="tr-just" value="${row.just || ''}"></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function addTrainingRow() {
+            const tbody = document.getElementById('training-rows');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="text" class="tr-title" placeholder="Training title"></td>
+                <td><input type="date" class="tr-init"></td>
+                <td><input type="date" class="tr-rec"></td>
+                <td><input type="text" class="tr-just"></td>
+            `;
+            tbody.appendChild(row);
+        }
+
+        function renderSkillsTables() {
+            const container = document.getElementById('skills-container');
+            container.innerHTML = '';
+            const selected = getSelectedCategories();
+            if (!selected.length) {
+                container.innerHTML = '<p class="muted">Select assessment categories in Section 2 to begin scoring.</p>';
+                return;
+            }
+
+            const combined = selected.length > 1;
+            const key = combined ? 'combined' : selected[0];
+            if (!scores[key]) scores[key] = {};
+            if (!naJustifications[key]) naJustifications[key] = {};
+
+            const title = combined
+                ? `Combined Categories: ${selected.map(c => `${c} - ${categories[c]}`).join(' | ')}`
+                : `Category ${key}: ${categories[key]}`;
+
+            const table = document.createElement('table');
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th colspan="5">${title}</th>
+                    </tr>
+                    <tr>
+                        <th style="width:40px;">#</th>
+                        <th>Question</th>
+                        <th style="width:120px;">Score</th>
+                        <th style="width:80px;">N/A</th>
+                        <th style="width:220px;">N/A Justification *</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${questions.map((q, i) => {
+                        const qnum = i + 1;
+                        const applicable = combined ? isApplicableForSelected(qnum, selected) : isApplicable(qnum, Number(key));
+                        if (!applicable) {
+                            scores[key][i] = 'NA';
+                            naJustifications[key][i] = 'Auto N/A';
+                        } else if (naJustifications[key]?.[i] === 'Auto N/A' && scores[key]?.[i] === 'NA') {
+                            scores[key][i] = '';
+                            naJustifications[key][i] = '';
+                        }
+                        const val = scores[key][i] ?? '';
+                        const naChecked = val === 'NA';
+                        const justVal = naJustifications[key][i] || '';
+                        const autoNA = !applicable;
+                        return `
+                            <tr class="${autoNA ? 'na-row' : ''}">
+                                <td>${i + 1}</td>
+                                <td>${q}</td>
+                                <td>
+                                    ${autoNA ? '<span class="na-label">N/A</span>' : `
+                                        <select class="score-select" data-cat="${key}" data-q="${i}" ${naChecked ? 'disabled' : ''}>
+                                            <option value="">Select</option>
+                                            <option value="1" ${val === 1 ? 'selected' : ''}>1</option>
+                                            <option value="0.5" ${val === 0.5 ? 'selected' : ''}>0.5</option>
+                                            <option value="0" ${val === 0 ? 'selected' : ''}>0</option>
+                                        </select>
+                                    `}
+                                </td>
+                                <td>
+                                    <input type="checkbox" data-na="${key}-${i}" ${naChecked ? 'checked' : ''} ${autoNA ? 'checked disabled' : ''}>
+                                </td>
+                                <td>
+                                    <input type="text" data-na-just="${key}-${i}" value="${autoNA ? 'Auto N/A' : justVal}" ${naChecked && !autoNA ? '' : 'disabled'}>
+                                </td>
+                            </tr>
+                        `;
+                    }).join('')}
+                </tbody>
+            `;
+            container.appendChild(table);
+
+            bindScoreHandlers();
+            updateReport();
+        }
+
+        function bindScoreHandlers() {
+            document.querySelectorAll('.score-select').forEach(sel => {
+                sel.onchange = (e) => {
+                    const cat = e.target.getAttribute('data-cat');
+                    const q = e.target.getAttribute('data-q');
+                    const val = e.target.value === '' ? '' : parseFloat(e.target.value);
+                    scores[cat][q] = val;
+                    updateReport();
+                };
+            });
+            document.querySelectorAll('input[data-na]').forEach(cb => {
+                cb.onchange = (e) => {
+                    const key = e.target.getAttribute('data-na');
+                    const [cat, q] = key.split('-');
+                    if (e.target.checked) {
+                        scores[cat][q] = 'NA';
+                    } else {
+                        scores[cat][q] = '';
+                        naJustifications[cat][q] = '';
+                    }
+                    renderSkillsTables();
+                };
+            });
+            document.querySelectorAll('input[data-na-just]').forEach(input => {
+                input.oninput = (e) => {
+                    const key = e.target.getAttribute('data-na-just');
+                    const [cat, q] = key.split('-');
+                    if (!naJustifications[cat]) naJustifications[cat] = {};
+                    naJustifications[cat][q] = e.target.value;
+                };
+            });
+        }
+
+        function computeScore(catId) {
+            const s = scores[catId] || {};
+            let total = 0;
+            let applicable = 0;
+            questions.forEach((_, i) => {
+                const val = s[i];
+                if (val === 'NA' || val === '' || val === undefined) return;
+                applicable += 1;
+                total += Number(val);
+            });
+            const pct = applicable ? (total / applicable) * 100 : 0;
+            return { total, applicable, pct };
+        }
+
+        function updateReport() {
+            document.getElementById('rep_name').textContent = document.getElementById('ass_name').value || '-';
+            document.getElementById('rep_staff').textContent = document.getElementById('ass_staff').value || '-';
+            document.getElementById('rep_desig').textContent = document.getElementById('ass_designation').value || '-';
+            document.getElementById('rep_qa').textContent = document.getElementById('ass_qa').value || '-';
+            document.getElementById('rep_join').textContent = document.getElementById('ass_join').value || '-';
+            document.getElementById('rep_period').textContent = document.getElementById('ass_period').value || '-';
+            document.getElementById('rep_section').textContent = document.getElementById('ass_section').value || '-';
+            document.getElementById('rep_assess_date').textContent = document.getElementById('assessment_date').value || '-';
+            document.getElementById('rep_purpose').textContent = document.getElementById('purpose_select').value || '-';
+            const selected = getSelectedCategories();
+            document.getElementById('rep_categories').textContent = selected.map(c => `Category ${c}: ${categories[c]}`).join(' | ') || '-';
+
+            const scoreWrap = document.getElementById('rep_scores');
+            scoreWrap.innerHTML = '';
+            if (selected.length > 1) {
+                const { total, applicable, pct } = computeScore('combined');
+                const status = pct >= 75 ? 'Meets requirement' : 'Below requirement';
+                const badge = pct >= 75 ? 'ok' : 'warn';
+                const line = document.createElement('p');
+                line.innerHTML = `<strong>Combined Categories</strong> — S=${total.toFixed(1)}, Q=${applicable}, Result=${pct.toFixed(1)}% <span class="badge ${badge}">${status}</span>`;
+                scoreWrap.appendChild(line);
+            } else {
+                selected.forEach(c => {
+                    const { total, applicable, pct } = computeScore(c);
+                    const status = pct >= 75 ? 'Meets requirement' : 'Below requirement';
+                    const badge = pct >= 75 ? 'ok' : 'warn';
+                    const line = document.createElement('p');
+                    line.innerHTML = `<strong>Category ${c}</strong> — S=${total.toFixed(1)}, Q=${applicable}, Result=${pct.toFixed(1)}% <span class="badge ${badge}">${status}</span>`;
+                    scoreWrap.appendChild(line);
+                });
+            }
+
+            const trainingWrap = document.getElementById('rep_training');
+            const trainingRows = Array.from(document.querySelectorAll('#training-rows tr')).map(row => {
+                const titleInput = row.querySelector('.tr-title');
+                return {
+                    title: titleInput ? titleInput.value.trim() : row.children[0].textContent.trim(),
+                    init: row.querySelector('.tr-init')?.value || '-',
+                    rec: row.querySelector('.tr-rec')?.value || '-',
+                    just: row.querySelector('.tr-just')?.value || '-'
+                };
+            });
+            trainingWrap.innerHTML = `
+                <table>
+                    <thead>
+                        <tr><th>Training</th><th>Initial</th><th>Recurrent</th><th>Justification</th></tr>
+                    </thead>
+                    <tbody>
+                        ${trainingRows.map(r => `
+                            <tr>
+                                <td>${r.title || '-'}</td>
+                                <td>${r.init || '-'}</td>
+                                <td>${r.rec || '-'}</td>
+                                <td>${r.just || '-'}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            const skillsWrap = document.getElementById('rep_skills');
+            if (selected.length > 1) {
+                const rows = questions.map((q, i) => {
+                    const qnum = i + 1;
+                    const applicable = isApplicableForSelected(qnum, selected);
+                    const val = applicable ? (scores['combined']?.[i] ?? '-') : 'N/A';
+                    const just = applicable ? (naJustifications['combined']?.[i] || '-') : 'Auto N/A';
+                    return `
+                        <tr>
+                            <td>${i + 1}</td>
+                            <td>${q}</td>
+                            <td>${val === 'NA' ? 'N/A' : val}</td>
+                            <td>${val === 'NA' || !applicable ? just : '-'}</td>
+                        </tr>
+                    `;
+                }).join('');
+                skillsWrap.innerHTML = `
+                    <table>
+                        <thead>
+                            <tr><th colspan="4">Combined Categories: ${selected.map(c => `${c} - ${categories[c]}`).join(' | ')}</th></tr>
+                            <tr><th>#</th><th>Question</th><th>Score</th><th>N/A Justification</th></tr>
+                        </thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                `;
+            } else {
+                skillsWrap.innerHTML = selected.map(c => {
+                    const rows = questions.map((q, i) => {
+                        const qnum = i + 1;
+                        const applicable = isApplicable(qnum, Number(c));
+                        const val = applicable ? (scores[c]?.[i] ?? '-') : 'N/A';
+                        const just = applicable ? (naJustifications[c]?.[i] || '-') : 'Auto N/A';
+                        return `
+                            <tr>
+                                <td>${i + 1}</td>
+                                <td>${q}</td>
+                                <td>${val === 'NA' ? 'N/A' : val}</td>
+                                <td>${val === 'NA' || !applicable ? just : '-'}</td>
+                            </tr>
+                        `;
+                    }).join('');
+                    return `
+                        <table>
+                            <thead>
+                                <tr><th colspan="4">Category ${c}: ${categories[c]}</th></tr>
+                                <tr><th>#</th><th>Question</th><th>Score</th><th>N/A Justification</th></tr>
+                            </thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                    `;
+                }).join('') || '<p class="muted">No categories selected.</p>';
+            }
+
+            const evalDetail = document.getElementById('rep_eval_detail');
+            evalDetail.innerHTML = `
+                <p><strong>Assessor Name:</strong> ${document.getElementById('eval_assessor').value || '-'}</p>
+                <p><strong>Assessor Designation:</strong> ${document.getElementById('eval_designation').value || '-'}</p>
+                <p><strong>Evaluation Date:</strong> ${document.getElementById('eval_date').value || '-'}</p>
+                <p><strong>Decision:</strong> ${document.getElementById('eval_decision').value || '-'}</p>
+            `;
+
+            const decision = document.getElementById('eval_decision').value;
+            const repEval = document.getElementById('rep_eval');
+            if (decision === 'competent') {
+                repEval.textContent = 'COMPETENT';
+                repEval.className = 'report-result good';
+            } else if (decision === 'needs_improve') {
+                repEval.textContent = 'NEEDS IMPROVEMENT';
+                repEval.className = 'report-result bad';
+            } else {
+                repEval.textContent = '-';
+                repEval.className = 'report-result neutral';
+            }
+            document.getElementById('rep_remarks').textContent = document.getElementById('remarks_text').value || '-';
+        }
+
+        function validateStep(step) {
+            if (!document.getElementById('assessment_date').value) return false;
+            if (step === 0) {
+                const req = ['ass_name','ass_staff','ass_designation','ass_join','ass_period','ass_section'];
+                return req.every(id => document.getElementById(id).value.trim() !== '');
+            }
+            if (step === 1) {
+                const purpose = document.getElementById('purpose_select').value;
+                return purpose && getSelectedCategories().length > 0;
+            }
+            if (step === 2) {
+                const rows = Array.from(document.querySelectorAll('#training-rows tr'));
+                return rows.every(row => {
+                    const titleInput = row.querySelector('.tr-title');
+                    const title = titleInput ? titleInput.value.trim() : row.children[0].textContent.trim();
+                    const init = row.querySelector('.tr-init')?.value || '';
+                    const rec = row.querySelector('.tr-rec')?.value || '';
+                    const just = row.querySelector('.tr-just')?.value.trim() || '';
+                    if (!title) return false;
+                    if (init && rec) return true;
+                    return just.length > 0;
+                });
+            }
+            if (step === 3) {
+                const selected = getSelectedCategories();
+                if (!selected.length) return false;
+                const key = selected.length > 1 ? 'combined' : selected[0];
+                for (let i = 0; i < questions.length; i++) {
+                    const qnum = i + 1;
+                    const applicable = selected.length > 1
+                        ? isApplicableForSelected(qnum, selected)
+                        : isApplicable(qnum, Number(key));
+                    if (!applicable) continue;
+                    const val = scores[key]?.[i];
+                    if (val === '' || val === undefined) return false;
+                    if (val === 'NA') {
+                        const just = naJustifications[key]?.[i] || '';
+                        if (!just.trim()) return false;
+                    }
+                }
+                return true;
+            }
+            if (step === 4) {
+                const req = ['eval_assessor','eval_designation','eval_date','eval_decision'];
+                if (!req.every(id => document.getElementById(id).value.trim() !== '')) return false;
+                return document.getElementById('eval_signature_confirm').checked;
+            }
+            if (step === 5) {
+                const req = ['remarks_text','rem_assessor','rem_date','sig_section_manager'];
+                if (!req.every(id => document.getElementById(id).value.trim() !== '')) return false;
+                return document.getElementById('rem_signature_confirm').checked;
+            }
+            return true;
+        }
+
+        function requestStep(target) {
+            for (let i = 0; i < target; i++) {
+                if (!validateStep(i)) {
+                    alert('Please complete all required fields in previous steps before proceeding.');
+                    return;
+                }
+            }
+            showStep(target);
+        }
+
+        function showStep(step) {
+            currentStep = step;
+            document.querySelectorAll('.step-btn').forEach((btn, idx) => {
+                btn.classList.toggle('active', idx === step);
+            });
+            document.querySelectorAll('.step-content').forEach((sc, idx) => {
+                sc.classList.toggle('active', idx === step);
+            });
+            updateReport();
+        }
+
+        function nextStep() {
+            if (!validateStep(currentStep)) {
+                alert('Please complete all required fields for this step.');
+                return;
+            }
+            if (currentStep < 5) {
+                showStep(currentStep + 1);
+                return;
+            }
+            activateTab('report');
+        }
+
+        function prevStep() {
+            if (currentStep > 0) showStep(currentStep - 1);
+        }
+
+        function saveData() {
+            const training = Array.from(document.querySelectorAll('#training-rows tr')).map(row => ({
+                title: row.querySelector('.tr-title')?.value || row.children[0].textContent.trim(),
+                init: row.querySelector('.tr-init')?.value || '',
+                rec: row.querySelector('.tr-rec')?.value || '',
+                just: row.querySelector('.tr-just')?.value || ''
+            }));
+
+            const data = {
+                assessmentDate: assessment_date.value,
+                assessee: {
+                    name: ass_name.value,
+                    staff: ass_staff.value,
+                    designation: ass_designation.value,
+                    qa: ass_qa.value,
+                    join: ass_join.value,
+                    period: ass_period.value,
+                    section: ass_section.value
+                },
+                purpose: purpose_select.value,
+                categories: getSelectedCategories(),
+                training,
+                scores,
+                naJustifications,
+                evaluation: {
+                    assessor: eval_assessor.value,
+                    designation: eval_designation.value,
+                    date: eval_date.value,
+                    decision: eval_decision.value
+                },
+                remarks: {
+                    text: remarks_text.value,
+                    assessor: rem_assessor.value,
+                    date: rem_date.value,
+                    manager: sig_section_manager.value
+                }
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'competent-plus-assessment.json';
+            a.click();
+        }
+
+        function loadData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const data = JSON.parse(reader.result);
+                    assessment_date.value = data.assessmentDate || '';
+                    ass_name.value = data.assessee?.name || '';
+                    ass_staff.value = data.assessee?.staff || '';
+                    ass_designation.value = data.assessee?.designation || '';
+                    ass_qa.value = data.assessee?.qa || '';
+                    ass_join.value = data.assessee?.join || '';
+                    ass_period.value = data.assessee?.period || '';
+                    ass_section.value = data.assessee?.section || '';
+                    
+                    purpose_select.value = data.purpose || '';
+                    document.querySelectorAll('.cat').forEach(c => { c.checked = false; });
+                    (data.categories || []).forEach(c => {
+                        const el = document.querySelector(`.cat[value="${c}"]`);
+                        if (el) el.checked = true;
+                    });
+                    scores = data.scores || {};
+                    naJustifications = data.naJustifications || {};
+                    initTrainingRows(data.training || null);
+
+                    eval_assessor.value = data.evaluation?.assessor || '';
+                    eval_designation.value = data.evaluation?.designation || '';
+                    eval_date.value = data.evaluation?.date || '';
+                    eval_decision.value = data.evaluation?.decision || '';
+                    eval_signature_confirm.checked = false;
+
+                    remarks_text.value = data.remarks?.text || '';
+                    rem_assessor.value = data.remarks?.assessor || '';
+                    rem_date.value = data.remarks?.date || '';
+                    sig_section_manager.value = data.remarks?.manager || '';
+                    rem_signature_confirm.checked = false;
+
+                    renderSkillsTables();
+                    updateReport();
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function resetForm() {
+            assessment_date.value = '';
+            ass_name.value = '';
+            ass_staff.value = '';
+            ass_designation.value = '';
+            ass_qa.value = '';
+            ass_join.value = '';
+            ass_period.value = '';
+            ass_section.value = '';
+            
+            purpose_select.value = '';
+            document.querySelectorAll('.cat').forEach(c => { c.checked = false; });
+            scores = {};
+            naJustifications = {};
+            initTrainingRows();
+            eval_assessor.value = '';
+            eval_designation.value = '';
+            eval_date.value = '';
+            eval_decision.value = '';
+            eval_signature_confirm.checked = false;
+            remarks_text.value = '';
+            rem_assessor.value = '';
+            rem_date.value = '';
+            sig_section_manager.value = '';
+            rem_signature_confirm.checked = false;
+            renderSkillsTables();
+            showStep(0);
+        }
+
+        function fillDemoData() {
+            assessment_date.value = '2026-02-05';
+            ass_name.value = 'John Doe';
+            ass_staff.value = 'KAC-12345';
+            ass_designation.value = 'Certifying Staff';
+            ass_qa.value = 'KUK-7890';
+            ass_join.value = '2018-06-15';
+            ass_period.value = '3 years';
+            ass_section.value = 'Line Maintenance - KWI';
+            
+            purpose_select.value = 'Recurrent/Renewal';
+            document.querySelectorAll('.cat').forEach(c => { c.checked = false; });
+            document.querySelector('.cat[value="4"]').checked = true;
+            document.querySelector('.cat[value="7"]').checked = true;
+            scores = {};
+            naJustifications = {};
+            initTrainingRows([
+                { title: 'Human Factors Training', init: '2024-01-10', rec: '2025-12-10', just: '' },
+                { title: 'Fuel Tank Safety (if applicable)', init: '', rec: '', just: 'Not applicable to role' },
+                { title: 'SMS', init: '2024-03-01', rec: '2025-03-01', just: '' },
+                { title: 'EWIS', init: '', rec: '', just: 'Not applicable to role' },
+                { title: 'MOE / CAME / EQCP', init: '2024-04-15', rec: '2025-04-15', just: '' },
+                { title: 'EASA/KCASR Part M / 145 / 66 / 147', init: '2024-05-20', rec: '2025-05-20', just: '' }
+            ]);
+            eval_assessor.value = 'Engr. Abdulmuhsen Haji Mohammad';
+            eval_designation.value = 'Quality Engineer';
+            eval_date.value = '2026-02-05';
+            eval_decision.value = 'competent';
+            eval_signature_confirm.checked = true;
+            remarks_text.value = 'No improvement actions required.';
+            rem_assessor.value = 'Engr. Abdulmuhsen Haji Mohammad';
+            rem_date.value = '2026-02-05';
+            sig_section_manager.value = 'Section Manager Name';
+            rem_signature_confirm.checked = true;
+            const selected = getSelectedCategories();
+            const key = selected.length > 1 ? 'combined' : selected[0];
+            scores[key] = scores[key] || {};
+            naJustifications[key] = naJustifications[key] || {};
+            for (let i = 0; i < questions.length; i++) {
+                const qnum = i + 1;
+                const applicable = selected.length > 1
+                    ? isApplicableForSelected(qnum, selected)
+                    : isApplicable(qnum, Number(key));
+                if (applicable) {
+                    scores[key][i] = 1;
+                }
+            }
+            renderSkillsTables();
+            updateReport();
+            showStep(0);
+        }
+
+        function activateTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            const tabButton = document.querySelector(`.tab[onclick*=\"'${tabName}'\"]`);
+            if (tabButton) tabButton.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+
+            const actionButtons = document.getElementById('action-buttons');
+            if (actionButtons) {
+                actionButtons.style.display = ['assessment', 'report'].includes(tabName) ? 'flex' : 'none';
+            }
+            updateReport();
+        }
+
+        function switchTab(tabName) {
+            activateTab(tabName);
+        }
+
+        document.querySelectorAll('.cat').forEach(c => c.addEventListener('change', enforceCategoryLimit));
+        initTrainingRows();
+        renderSkillsTables();
+
+        if (window.mermaid) {
+            mermaid.initialize({
+                startOnLoad: true,
+                theme: 'base',
+                themeVariables: {
+                    primaryColor: '#e0f2fe',
+                    primaryBorderColor: '#0ea5e9',
+                    primaryTextColor: '#0f172a',
+                    lineColor: '#0ea5e9',
+                    secondaryColor: '#f8fafc',
+                    tertiaryColor: '#ffffff',
+                    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+                }
+            });
+        }
+    </script>
+</body>
+</html>
